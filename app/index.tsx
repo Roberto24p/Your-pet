@@ -1,3 +1,4 @@
+///<reference types="nativewind/types"/>
 import { StatusBar } from 'expo-status-bar';
 import { Image, ScrollView, Text, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
@@ -6,10 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../constants';
 import CustomButton from '../components/CustomButton';
 import { useGlobalContext } from '../context/GlobalProvider';
+import { useAuth } from '../context/AuthContext';
 
 export default function App() {
-  const { isLoading, isLoggedin } = useGlobalContext();
-  if( !isLoading && isLoggedin) return <Redirect href="/home"/>
+  // const { isLoading, isLoggedin } = useGlobalContext();
+  const { authState } = useAuth();
+  if( authState.authenticated ) return <Redirect href="/home"/>
 
   return (
     <SafeAreaView className='bg-primary h-full'>
@@ -43,7 +46,7 @@ export default function App() {
             </Text>
             <CustomButton
               title="Continua con el email"
-              handlePress={ () => router.push('/profile')}
+              handlePress={ () => router.push('/sign-up')}
               containerStyles="w-full mt-7"
             />
         </View>

@@ -7,9 +7,11 @@ import CustomButton from '../../components/CustomButton';
 
 import { Link, router } from 'expo-router'
 import { createUser } from '../../lib/appwrite';
+import { useAuth } from '../../context/AuthContext';
 
 const SignUp = () => {
-    const { setUser, setIsLoggedIn } = useGlobalContext();
+    // const { setUser, setIsLoggedIn } = useGlobalContext();
+    const { onRegister } = useAuth();
 
     const [form, setForm] = useState({
         username: '', 
@@ -25,9 +27,11 @@ const SignUp = () => {
         }
         setIsSubmitting(true);
         try {
-            const result = await createUser(form.email, form.password, form.username);
-            setUser(result);
-            setIsLoggedIn(true);
+            const result = await onRegister(form.email, form.password);
+            // const result = await createUser(form.email, form.password, form.username);
+            // setUser(result);
+            // setIsLoggedIn(true);
+            
             router.replace('/home');
         }catch ( error ) {
             Alert.alert('Error', error.message)

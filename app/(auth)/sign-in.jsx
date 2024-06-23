@@ -8,9 +8,12 @@ import CustomButton from '../../components/CustomButton';
 import { Link, router } from 'expo-router'
 import { getCurrentUser, signIn } from '../../lib/appwrite';
 import { useGlobalContext } from '../../context/GlobalProvider';
+import { useAuth } from '../../context/AuthContext';
 
 const SignIn = () => {
-    const { setUser, setIsLoggedIn } = useGlobalContext();
+    // const { setUser, setIsLoggedIn } = useGlobalContext();
+    const { onLogin } = useAuth();
+
     const [isSubmitting, setIsSubmitting] = useState(false) 
 
     const [form, setForm] = useState({
@@ -25,13 +28,17 @@ const SignIn = () => {
         }
         setIsSubmitting(true);
         try {
-            await signIn(form.email, form.password);
-            const result = await getCurrentUser();
-            setUser(result);
-            setIsLoggedIn(true);
+            // await signIn(form.email, form.password);
+            // const result = await getCurrentUser();
+            const result = await onLogin(form.email, form.password);
+            console.log(result)
+            if( result.token ){
+                Alert.alert("Success", "User signed in successfully");
+                router.replace('/home')
+            }
+            // setUser(result);
+            // setIsLoggedIn(true);
 
-            Alert.alert("Success", "User signed in successfully");
-            router.replace('/home')
         }catch ( error ) {
             Alert.alert('Error', error.message)
         }finally {

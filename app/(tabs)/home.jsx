@@ -1,31 +1,34 @@
-import React  from 'react'
+import React, { useEffect, useState }  from 'react'
 import { FlatList, RefreshControl, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import EmptyState from '../../components/EmptyState'
 import CustomButton from '../../components/CustomButton'
 import { Link, router } from 'expo-router'
+import { useAuth } from '../../context/AuthContext'
+import ImageCard from '../../components/ImageCard'
 
 const Home = () => {
-    console.log('ESTOY EN EL HOME')
+    const { petsUser } = useAuth();
+    const [pets, setPets] = useState([]);
+    const [refreshing, setRefresh]= useState(false);
+
+    useEffect( () => {
+        getPetsFromUser();
+    }, []);
+
+    const getPetsFromUser = async () => {
+        setRefresh(true);
+        const result = await petsUser();
+        setPets(result);
+        setRefresh(false);
+    }
     const redirectToCreate = () => {
         router.replace('/create')
     }
+
     return (
         <SafeAreaView className="bg-primary">
-            <FlatList
-                refreshControl={
-                    <RefreshControl
-                        onRefresh={() => console.log('refreshing')}
-                    />
-                }
-                className="mb-10"
-                data={[ ]}
-                keyExtractor={ (item) => item.id }
-                renderItem={( { item } ) => (
-                    <Text className="p-1">{item.id}</Text>
-                )}
-                ListHeaderComponent={ () => (
-                    <View className="mt-10 px-3 space-y-6">
+               <View className="mt-10 px-3 space-y-3">
                         <View className="justify-between items-start flex-row">
                             <View>
                                 <Text className="font-pmedium text-sm text-gray-700">
@@ -36,6 +39,31 @@ const Home = () => {
                                 </Text>
                             </View>
                         </View>
+                        <View className='justify-center items-center'>
+                            <Text className="font-pmedium text-xl text-gray-700">
+                                Tus mascotas
+                            </Text>
+                        </View>
+                    </View>
+            <FlatList
+                horizontal={true}
+                refreshControl={
+                    <RefreshControl
+                        onRefresh={getPetsFromUser}
+                        refreshing={refreshing}
+                    />
+                }
+                className="mb-10"
+                data={ pets }
+                keyExtractor={ (item) => item.id }
+                renderItem={( { item } ) => (
+                    <View className='h-45 p-3'>
+                        <ImageCard
+                            title={item.name}
+                            id={item.id}
+                            urlImage={item.image}
+                            description={item.description}
+                        />
                     </View>
                 )}
                 ListEmptyComponent={ () => (
